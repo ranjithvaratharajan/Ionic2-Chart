@@ -92,3 +92,30 @@ if (rootdir) {
   }
 
 }
+
+var availablePlatforms = (process.env.CORDOVA_PLATFORMS ? process.env.CORDOVA_PLATFORMS.split(',') : []);
+
+var filestocopy = [
+  {"src/assets/libs/Chart.bundle.js": "platforms/android/assets/libs/Chart.bundle.js"}
+];
+
+for(var x=0; x<availablePlatforms.length; x++) {
+
+  var currentPlatform = availablePlatforms[x].trim().toLowerCase();
+
+  if (currentPlatform == 'android') {
+    filestocopy.forEach(function(obj) {
+      Object.keys(obj).forEach(function(key) {
+        var val = obj[key];
+        var srcfile = path.join(rootdir, key);
+        var destfile = path.join(rootdir, val);
+        var destdir = path.dirname(destfile);
+        if (fs.existsSync(srcfile) && fs.existsSync(destdir)) {
+          fs.createReadStream(srcfile).pipe(
+              fs.createWriteStream(destfile));
+        }
+      });
+    });
+
+  }
+}
